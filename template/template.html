@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+	<title>{{title}} / tombo.sh</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body, pre code {
+			line-height: 1;
+			font-family: ui-monospace,
+				Menlo, Monaco,
+				"JetBrains Mono", "Cascadia Mono", "Segoe UI Mono",
+				Consolas,
+				"Lucida Console",
+				"Roboto Mono",
+				"Oxygen Mono",
+				"Ubuntu Monospace",
+				"Source Code Pro",
+				"Fira Mono",
+				"Droid Sans Mono",
+				"Courier New", monospace;
+		}
+		body {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+			color: #222;
+		}
+		#body {
+			flex: 1;
+		}
+		#header {
+			display: flex;
+			align-items: center;
+			margin-bottom: 32px;
+		}
+		#header h1 {
+			flex: 1;
+			font-size: 24pt;
+		}
+		#header h1 a {
+			color: #222;
+			text-decoration: none;
+		}
+		a {
+			color: #3fa9f5;
+		}
+		a:hover, #header h1 a:hover {
+			background-color: #3fa9f5;
+			text-decoration: none;
+			color: #fff;
+		}
+		#footer a {
+			color: #fff;
+		}
+		#footer a:hover {
+			background-color: #fff;
+			color: #3fa9f5;
+			text-decoration: none;
+		}
+		img {
+			max-width: 100%;
+		}
+		hr {
+			border: 0;
+			border-top: 1px solid #3fa9f5;
+			margin: 32px 0;
+		}
+		ul, ol {
+			margin-left: 32px;
+		}
+		.content {
+			width: 100%;
+			max-width: 800px;
+			margin: 32px auto;
+			padding: 0 32px;
+		}
+		nav {
+			text-align: right;
+		}
+		nav a {
+			margin: 8px;
+		}
+		#footer {
+			background-color: #3fa9f5;
+			color: #fff;
+			font-weight: 700;
+		}
+		#footer .content {
+			display: flex;
+			align-items: center;
+		}
+		#copy {
+			flex: 1;
+		}
+		pre code {
+			display: block;
+			background-color: #f8f8f8;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			padding: 16px;
+			overflow-x: auto;
+		}
+		article p  { font-size: 1.0rem; }
+		article h1 { font-size: 1.8rem; }
+		article h2 { font-size: 1.5rem; }
+		article h3 { font-size: 1.2rem; }
+		article:last-child {
+			margin-bottom: 0;
+		}
+
+		#archive li * {
+			display: inline-block;
+		}
+		#archive li span, #archive li a {
+			margin: 0 8px;
+		}
+		#archive li {
+			margin-bottom: 16px;
+		}
+
+		#single {
+			line-height: 1.618;
+		}
+		#single img, #single p, #single pre code, #single blockquote, #single ul, #single ol,
+		#single h1, #single h2, #single h3, #single h4, #single h5, #single h6, section.meta {
+			margin-bottom: 24px;
+		}
+
+		section.meta * {
+			margin: 0;
+			line-height: 1;
+			color: #555;
+		}
+		section.meta h1::empty {
+			display: none;
+		}
+
+		@media (max-width: 480px) {
+			#header, #footer .content {
+				display: block;
+				text-align: center;
+			}
+			#header nav {
+				display: none;
+			}
+			nav {
+				text-align: center;
+				margin-top: 16px;
+			}
+			nav a {
+				display: block;
+				padding: 16px;
+			}
+			article img {
+				max-width: calc(100% + 64px);
+				margin: auto -32px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div id="body" class="content">
+		<header id="header">
+			<h1><a href="/">tombo.sh</a></h1>
+			<nav>
+				<a href="/index.html">index</a>
+				<a href="https://git.tombo.sh/" target="_blank">git</a>
+				<a href="https://music.tombofry.co.uk/" target="_blank">music</a>
+			</nav>
+		</header>
+		<main>{{content}}</main>
+	</div>
+	<footer id="footer">
+		<div class="content">
+			<span id="copy">&copy; Tom Gardiner / TomboFry {{dateyear}}</span>
+			<nav>
+				<a href="/index.html">index</a>
+				<a href="https://git.tombo.sh/" target="_blank">git</a>
+				<a href="https://music.tombofry.co.uk/" target="_blank">music</a>
+			</nav>
+		</div>
+		<div class="content">
+			Software developer by day, asleep by night. Aspiring chiptune musician.
+		</div>
+	</footer>
+</body>
+</html>
