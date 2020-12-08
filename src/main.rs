@@ -1,5 +1,7 @@
 use dotenv::dotenv;
+use env_logger;
 use fs::write;
+use log;
 use regex::Regex;
 use std::collections::HashMap;
 use std::fs::{self, read_to_string};
@@ -24,6 +26,7 @@ fn get_all_dirs(path: &str) -> Vec<Box<Path>> {
 		let name = node.to_str().unwrap();
 
 		if name.ends_with(&dir_match) {
+			log::debug!("[get_all_dirs] Discovered {}", &name);
 			acc.push(node.into_boxed_path());
 			return acc;
 		}
@@ -54,6 +57,7 @@ fn group_by_year(files: &Vec<File>) -> HashMap<String, Vec<File>> {
 
 	files.iter().for_each(|file| {
 		if !map.contains_key(&file.year) {
+			log::debug!("[group_by_year] Adding year {}", &file.year);
 			map.insert(file.year.clone(), vec![]);
 		}
 		let vec = map.get_mut(&file.year).unwrap();
@@ -71,6 +75,9 @@ fn get_unique_folders(files: &Vec<File>) -> Vec<String> {
 	folders.sort();
 	folders.dedup();
 
+	log::debug!("[get_unique_folders] {} unique folders", &folders.len());
+	log::debug!("[get_unique_folders] {:?}", &folders);
+
 	folders
 }
 
@@ -79,11 +86,16 @@ fn create_directories(files: &Vec<File>) -> std::io::Result<()> {
 	let output_dir = env::get_output_dir();
 	let output_path = Path::new(&output_dir);
 
+	log::debug!("[create_directories] Creating '{}'", &output_dir);
 	fs::create_dir_all(output_path)?;
 
 	for folder in get_unique_folders(files) {
 		let path = output_path.join(folder);
 		if !path.exists() {
+			log::debug!(
+				"[create_directories] Creating '{}'",
+				path.to_str().unwrap()
+			);
 			fs::create_dir_all(path)?;
 		}
 	}
@@ -155,6 +167,7 @@ fn create_indexes(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 	let index = create_index(&template, &archive, "home", &year, files);
 
 	let write_path = util::str_to_path(&[output, "index.html"]).unwrap();
+	log::debug!("[create_indexes] Writing main index");
 	write(write_path, index)?;
 
 	let archives = group_by_year(files);
@@ -164,6 +177,10 @@ fn create_indexes(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 
 		let write_path =
 			util::str_to_path(&[output, &year, "index.html"]).unwrap();
+		log::debug!(
+			"[create_indexes] Writing '{}' index",
+			write_path.to_str().unwrap()
+		);
 		write(write_path, contents)?;
 	}
 
@@ -176,6 +193,10 @@ fn file_to_template(file: &File) -> std::io::Result<()> {
 	// TODO: Look at checksum and update the file if it's different
 	let path = Path::new(&file.output_file);
 	if path.exists() {
+		log::debug!(
+			"[file_to_template] '{}' already exists. Skipping.",
+			&path.to_str().unwrap()
+		);
 		return Ok(());
 	}
 
@@ -193,6 +214,10 @@ fn file_to_template(file: &File) -> std::io::Result<()> {
 	template = template.replace(r"{{title}}", &file.title);
 	template = template.replace(r"{{dateyear}}", &file.year);
 
+	log::debug!(
+		"[file_to_template] Writing article '{}'",
+		&path.to_str().unwrap()
+	);
 	write(&file.output_file, template)?;
 
 	Ok(())
@@ -210,8 +235,13 @@ fn copy_assets(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 				util::str_to_path(&[output, &file.year_month, &asset[1]])
 					.unwrap();
 			if destination.exists() {
+				log::debug!(
+					"[copy_assets] '{}' already exists. Skipping.",
+					&asset[1]
+				);
 				continue;
 			}
+			log::debug!("[copy_assets] Copying file '{}'", &asset[1]);
 			fs::copy(asset_path, destination)?;
 		}
 	}
@@ -220,8 +250,9 @@ fn copy_assets(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 }
 
 fn main() -> std::io::Result<()> {
-	// Step 0 - Load environment variables
+	// Step 0 - Set up environment
 	dotenv().ok();
+	env_logger::init();
 	let output_dir = env::get_output_dir();
 	let path = env::get_data_dir();
 
@@ -231,6 +262,8 @@ fn main() -> std::io::Result<()> {
 	// Step 2 - Get all articles/notes within each public directory
 	let mut files: Vec<File> =
 		dirs.into_iter().flat_map(|d| get_files(d)).collect();
+
+	log::debug!("[main] Found {} articles to generate", files.len());
 
 	// Step 3 - Sort files by date
 	files.sort_by(|a, b| b.datetime.partial_cmp(&a.datetime).unwrap());
