@@ -164,7 +164,7 @@ impl File {
 		let year_month = datetime.format("%Y/%m").to_string();
 
 		// Remaining fields
-		let slug = File::slugify(&title, &dateiso);
+		let slug = File::slugify(&title, &dateisoshort);
 		let url = File::determine_absolute_url(&slug, &datetime);
 		let rel_filename = format!("{}.html", slug);
 		let output_dir =
