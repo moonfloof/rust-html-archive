@@ -12,7 +12,6 @@
 		}
 
 		body, pre code {
-			line-height: 1;
 			font-family: ui-monospace,
 				Menlo, Monaco,
 				"JetBrains Mono", "Cascadia Mono", "Segoe UI Mono",
@@ -27,43 +26,51 @@
 				"Courier New", monospace;
 		}
 		body {
+			color: #222;
+			min-height: 100vh;
+			line-height: 1;
 			display: flex;
 			flex-direction: column;
-			min-height: 100vh;
-			color: #222;
 		}
-		#body {
-			flex: 1;
-		}
-		#header {
+		body > header {
 			display: flex;
 			align-items: center;
 			margin-bottom: 32px;
 		}
-		#header h1 {
+		body > header h1 {
 			flex: 1;
 			font-size: 24pt;
 		}
-		#header h1 a {
+		body > header h1 a {
 			color: #222;
-			text-decoration: none;
 		}
-		a {
-			color: #3fa9f5;
-		}
-		a:hover, #header h1 a:hover {
-			background-color: #3fa9f5;
-			text-decoration: none;
+		body > footer a {
 			color: #fff;
 		}
-		#footer a {
-			color: #fff;
-		}
-		#footer a:hover {
+		body > footer a:hover {
 			background-color: #fff;
 			color: #3fa9f5;
 			text-decoration: none;
 		}
+		body > footer {
+			background-color: #3fa9f5;
+			color: #fff;
+			font-weight: 700;
+		}
+		body > footer .content {
+			display: flex;
+			align-items: center;
+		}
+
+		a {
+			color: #3fa9f5;
+		}
+		a:hover, body > header h1 a:hover {
+			background-color: #3fa9f5;
+			text-decoration: none;
+			color: #fff;
+		}
+
 		img {
 			max-width: 100%;
 		}
@@ -75,30 +82,6 @@
 		ul, ol {
 			margin-left: 32px;
 		}
-		.content {
-			width: 100%;
-			max-width: 800px;
-			margin: 32px auto;
-			padding: 0 32px;
-		}
-		nav {
-			text-align: right;
-		}
-		nav a {
-			margin: 8px;
-		}
-		#footer {
-			background-color: #3fa9f5;
-			color: #fff;
-			font-weight: 700;
-		}
-		#footer .content {
-			display: flex;
-			align-items: center;
-		}
-		#copy {
-			flex: 1;
-		}
 		pre code {
 			display: block;
 			background-color: #f8f8f8;
@@ -107,6 +90,24 @@
 			padding: 16px;
 			overflow-x: auto;
 		}
+
+		.content {
+			width: 100%;
+			max-width: 800px;
+			margin: 32px auto;
+			padding: 0 32px;
+		}
+		.flex {
+			flex: 1;
+		}
+
+		nav {
+			text-align: right;
+		}
+		nav a {
+			margin: 8px;
+		}
+
 		article p  { font-size: 1.0rem; }
 		article h1 { font-size: 1.8rem; }
 		article h2 { font-size: 1.5rem; }
@@ -115,39 +116,43 @@
 			margin-bottom: 0;
 		}
 
+		article > header {
+			margin: 0;
+			line-height: 1;
+			color: #555;
+			margin-bottom: 24px;
+		}
+
+		article > section {
+			line-height: 1.618;
+		}
+		article > section img, article > section p, article > section pre code,
+		article > section blockquote, article > section ul, article > section ol,
+		article > section h1, article > section h2, article > section h3,
+		article > section h4, article > section h5, article > section h6 {
+			margin-bottom: 24px;
+		}
+
+		#archive li {
+			line-height: 1;
+			margin-bottom: 16px;
+		}
 		#archive li * {
 			display: inline-block;
 		}
 		#archive li span, #archive li a {
 			margin: 0 8px;
 		}
-		#archive li {
-			margin-bottom: 16px;
+		#archive li a {
+			font-weight: 700;
 		}
 
-		#single {
-			line-height: 1.618;
-		}
-		#single img, #single p, #single pre code, #single blockquote, #single ul, #single ol,
-		#single h1, #single h2, #single h3, #single h4, #single h5, #single h6, section.meta {
-			margin-bottom: 24px;
-		}
-
-		section.meta * {
-			margin: 0;
-			line-height: 1;
-			color: #555;
-		}
-		section.meta h1::empty {
-			display: none;
-		}
-
-		@media (max-width: 480px) {
-			#header, #footer .content {
+		@media (max-width: 460px) {
+			body > header, body > footer .content {
 				display: block;
 				text-align: center;
 			}
-			#header nav {
+			header nav {
 				display: none;
 			}
 			nav {
@@ -155,8 +160,9 @@
 				margin-top: 16px;
 			}
 			nav a {
-				display: block;
-				padding: 16px;
+				display: inline-block;
+				padding: 12px 24px;
+				margin: 0;
 			}
 			article img {
 				max-width: calc(100% + 64px);
@@ -166,29 +172,27 @@
 	</style>
 </head>
 <body>
-	<div id="body" class="content">
-		<header id="header">
-			<h1><a href="/">tombo.sh</a></h1>
-			<nav>
-				<a href="/index.html">index</a>
-				<a href="https://git.tombo.sh/" target="_blank">git</a>
-				<a href="https://music.tombofry.co.uk/" target="_blank">music</a>
-			</nav>
-		</header>
-		<main>{{content}}</main>
-	</div>
-	<footer id="footer">
+	<header class="content">
+		<h1><a href="/">tombo.sh</a></h1>
+		<nav>
+			<a href="/index.html">index</a>
+			<a href="https://git.tombo.sh/" target="_blank">git</a>
+			<a href="https://music.tombofry.co.uk/" target="_blank">music</a>
+		</nav>
+	</header>
+	<main class="content flex">
+		{{content}}
+	</main>
+	<footer>
 		<div class="content">
-			<span id="copy">&copy; Tom Gardiner / TomboFry {{dateyear}}</span>
+			<span class="flex">&copy; Tom Gardiner / TomboFry {{dateyear}}</span>
 			<nav>
 				<a href="/index.html">index</a>
 				<a href="https://git.tombo.sh/" target="_blank">git</a>
 				<a href="https://music.tombofry.co.uk/" target="_blank">music</a>
 			</nav>
 		</div>
-		<div class="content">
-			Software developer by day, asleep by night. Aspiring chiptune musician.
-		</div>
+		<div class="content">Software developer by day, asleep by night. Aspiring chiptune musician.</div>
 	</footer>
 </body>
 </html>
