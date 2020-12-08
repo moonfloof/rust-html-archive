@@ -65,19 +65,13 @@ fn group_by_year(files: &Vec<File>) -> HashMap<String, Vec<File>> {
 
 /// Return a list of unique folders based on the posts to convert
 fn get_unique_folders(files: &Vec<File>) -> Vec<String> {
-	files
-		.iter()
-		.fold(Vec::with_capacity(files.len()), |mut acc, file| {
-			if !acc.contains(&file.year) {
-				acc.push(file.year.clone());
-			}
+	let mut folders: Vec<String> =
+		files.iter().map(|file| file.year_month.clone()).collect();
 
-			if !acc.contains(&file.year_month) {
-				acc.push(file.year_month.clone());
-			}
+	folders.sort();
+	folders.dedup();
 
-			acc
-		})
+	folders
 }
 
 /// Create all year and month directories for
@@ -90,7 +84,7 @@ fn create_directories(files: &Vec<File>) -> std::io::Result<()> {
 	for folder in get_unique_folders(files) {
 		let path = output_path.join(folder);
 		if !path.exists() {
-			fs::create_dir(path)?;
+			fs::create_dir_all(path)?;
 		}
 	}
 
@@ -154,11 +148,10 @@ fn create_indexes(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 }
 
 /// Generate a single article file based on the contents of a file
-fn file_to_template(output: &str, file: &File) -> std::io::Result<()> {
+fn file_to_template(file: &File) -> std::io::Result<()> {
 	// Ignore files that have already been processed
 	// TODO: Look at checksum and update the file if it's different
-	let absolute_path = format!("{}{}", output, file.url);
-	let path = Path::new(&absolute_path);
+	let path = Path::new(&file.output_file);
 	if path.exists() {
 		return Ok(());
 	}
@@ -225,7 +218,7 @@ fn main() -> std::io::Result<()> {
 
 	// Step 5 - Convert each file into an article
 	for file in &files {
-		file_to_template(&output_dir, file)?;
+		file_to_template(file)?;
 	}
 
 	Ok(())
