@@ -113,15 +113,15 @@ fn create_index(
 	let list = files
 		.iter()
 		.map(|file| {
-			let dateiso = file.datetime.format("%Y-%m-%d").to_string();
 			let text = if file.title == "" {
 				shorten_text(&file.raw_contents)
 			} else {
 				String::from(&file.title)
 			};
+
 			format!(
 				"<li><span>{}</span><a href='{}'>{}</a></li>",
-				&dateiso, &file.url, &text
+				&file.dateisoshort, &file.url, &text
 			)
 		})
 		.collect::<Vec<String>>()

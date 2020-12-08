@@ -18,6 +18,7 @@ pub struct File {
 
 	pub datetime: NaiveDateTime,
 	pub dateiso: String,
+	pub dateisoshort: String,
 	pub datehuman: String,
 	pub year: String,
 	pub year_month: String,
@@ -155,8 +156,9 @@ impl File {
 
 		// Format dates
 		let datetime = File::determine_datetime(&entry);
-		let dateiso = datetime.format("%Y-%m-%d").to_string();
-		let datehuman = datetime.format("%Y-%m-%dT%H:%M:%SZ").to_string();
+		let dateiso = datetime.format("%Y-%m-%dT%H:%M:%SZ").to_string();
+		let dateisoshort = datetime.format("%Y-%m-%d").to_string();
+		let datehuman = datetime.format("%A, %d %b %Y").to_string();
 		let year = datetime.format("%Y").to_string();
 		let month = datetime.format("%m").to_string();
 		let year_month = datetime.format("%Y/%m").to_string();
@@ -184,6 +186,7 @@ impl File {
 
 			datetime,
 			dateiso,
+			dateisoshort,
 			datehuman,
 			year,
 			year_month,
