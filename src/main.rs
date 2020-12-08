@@ -129,19 +129,27 @@ fn create_index(
 /// Generate an index file for each unique year where articles have been posted.
 /// Also generate a main index file.
 fn create_indexes(output: &str, files: &Vec<File>) -> std::io::Result<()> {
-	let template = read_to_string("template\\template.html")?;
-	let archive = read_to_string("template\\archive.html")?;
+	let tmp_path = util::str_to_path(&["template", "template.html"]).unwrap();
+	let arc_path = util::str_to_path(&["template", "archive.html"]).unwrap();
+
+	let template = read_to_string(tmp_path)?;
+	let archive = read_to_string(arc_path)?;
 
 	let now = SystemTime::now();
 	let year = util::st_to_ndt(now).format("%Y").to_string();
 	let index = create_index(&template, &archive, "home", &year, files);
-	write(format!("{}\\index.html", output), index)?;
+
+	let write_path = util::str_to_path(&[output, "index.html"]).unwrap();
+	write(write_path, index)?;
 
 	let archives = group_by_year(files);
 	for (year, files) in archives {
 		let title = format!("Posts from {}", &year);
 		let contents = create_index(&template, &archive, &title, &year, &files);
-		write(format!("{}\\{}\\index.html", output, &year), contents)?;
+
+		let write_path =
+			util::str_to_path(&[output, &year, "index.html"]).unwrap();
+		write(write_path, contents)?;
 	}
 
 	Ok(())
@@ -156,8 +164,10 @@ fn file_to_template(file: &File) -> std::io::Result<()> {
 		return Ok(());
 	}
 
-	let mut template = read_to_string("template\\template.html")?;
-	let mut single = read_to_string("template\\single.html")?;
+	let tmp_path = util::str_to_path(&["template", "template.html"]).unwrap();
+	let sng_path = util::str_to_path(&["template", "single.html"]).unwrap();
+	let mut template = read_to_string(tmp_path)?;
+	let mut single = read_to_string(sng_path)?;
 
 	single = single.replace(r"{{title}}", &file.title);
 	single = single.replace(r"{{content}}", &file.contents);
@@ -181,14 +191,13 @@ fn copy_assets(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 		let assets = search.captures_iter(&file.contents);
 		for asset in assets {
 			let asset_path = file.path.with_file_name(&asset[1]);
-			let year_month = file.datetime.format("%Y\\%m").to_string();
 			let destination =
-				format!("{}\\{}\\{}", output, year_month, &asset[1]);
-			let to_path = Path::new(&destination);
-			if to_path.exists() {
+				util::str_to_path(&[output, &file.year_month, &asset[1]])
+					.unwrap();
+			if destination.exists() {
 				continue;
 			}
-			fs::copy(asset_path, to_path)?;
+			fs::copy(asset_path, destination)?;
 		}
 	}
 

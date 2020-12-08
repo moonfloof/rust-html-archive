@@ -1,7 +1,7 @@
 use std::env;
 
 pub fn get_output_dir() -> String {
-	let default = String::from(".\\output");
+	let default = String::from("./output");
 	env::var("OUTPUT_DIR").unwrap_or(default)
 }
 

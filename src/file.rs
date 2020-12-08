@@ -2,14 +2,14 @@ use crate::{env, util};
 use chrono::{NaiveDate, NaiveDateTime};
 use regex::Regex;
 use std::fs::{read_to_string, DirEntry};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 #[derive(Clone, Debug)]
 pub struct File {
 	pub path: Box<Path>,
 	pub url: String,
-	pub output_file: String,
-	pub output_dir: String,
+	pub output_file: PathBuf,
+	pub output_dir: PathBuf,
 
 	pub title: String,
 	pub slug: String,
@@ -155,8 +155,12 @@ impl File {
 		// Remaining fields
 		let url = File::determine_absolute_url(&title, &datetime);
 		let slug = File::slugify(&title);
-		let output_dir = format!("{}\\{}\\{}", &env_output_dir, &year, &month);
-		let output_file = format!("{}\\{}.html", &output_dir, &slug);
+		let rel_filename = format!("{}.html", slug);
+		let output_dir =
+			util::str_to_path(&[&env_output_dir, &year, &month]).unwrap();
+		let output_dir_str = output_dir.to_str().unwrap();
+		let output_file =
+			util::str_to_path(&[output_dir_str, &rel_filename]).unwrap();
 
 		Some(File {
 			path,
