@@ -23,6 +23,7 @@ pub struct File {
 }
 
 impl File {
+	/// Convert an article title into an ASCII, URL-friendly string
 	fn slugify(title: &str) -> String {
 		let mut slug = title
 			.chars()
@@ -44,6 +45,8 @@ impl File {
 		slug
 	}
 
+	/// Figure out the extension of a given file. If not supported,
+	/// return None.
 	fn determine_extension(name: &str) -> Option<String> {
 		env::get_extensions().into_iter().fold(None, |acc, ext| {
 			let new_ext = format!(".{}", ext);
@@ -55,6 +58,7 @@ impl File {
 		})
 	}
 
+	/// Remove ISO date from filenames to generate article title
 	fn determine_title(entry: &DirEntry, extension: &str) -> String {
 		let mut name = String::from(entry.file_name().to_str().unwrap());
 
@@ -71,6 +75,7 @@ impl File {
 		name
 	}
 
+	/// Simple conversion of text files into HTML (adds paragraphs and line breaks)
 	fn determine_contents(path: &Box<Path>, extension: &str) -> String {
 		let mut contents = read_to_string(&path).unwrap();
 

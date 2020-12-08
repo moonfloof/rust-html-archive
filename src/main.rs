@@ -12,6 +12,7 @@ mod util;
 
 use file::File;
 
+/// Get all public directories
 fn get_all_dirs(path: &str) -> Vec<Box<Path>> {
 	let dir_match = env::get_public_dir();
 	fs::read_dir(path).unwrap().fold(vec![], |mut acc, p| {
@@ -46,6 +47,8 @@ fn get_files(path: Box<Path>) -> Vec<File> {
 		.collect()
 }
 
+/// Convert single Vec of Files into groups of years
+/// (for making yearly archives)
 fn group_by_year(files: &Vec<File>) -> HashMap<String, Vec<File>> {
 	let mut map: HashMap<String, Vec<File>> = HashMap::new();
 
@@ -94,6 +97,8 @@ fn create_directories(files: &Vec<File>) -> std::io::Result<()> {
 	Ok(())
 }
 
+/// Generate the contents for an archive index file. Either for a yearly archive
+/// or for the entire collection for the main index.
 fn create_index(
 	template_html: &str,
 	archive_html: &str,
@@ -127,6 +132,8 @@ fn create_index(
 	template
 }
 
+/// Generate an index file for each unique year where articles have been posted.
+/// Also generate a main index file.
 fn create_indexes(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 	let template = read_to_string("template\\template.html")?;
 	let archive = read_to_string("template\\archive.html")?;
@@ -146,6 +153,7 @@ fn create_indexes(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 	Ok(())
 }
 
+/// Generate a single article file based on the contents of a file
 fn file_to_template(output: &str, file: &File) -> std::io::Result<()> {
 	// Ignore files that have already been processed
 	// TODO: Look at checksum and update the file if it's different
@@ -172,6 +180,8 @@ fn file_to_template(output: &str, file: &File) -> std::io::Result<()> {
 	Ok(())
 }
 
+/// Grab any locally linked assets in the contents of a file into the same
+/// folder as the article.
 fn copy_assets(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 	let search = Regex::new(r#""\./(.*)""#).unwrap();
 	for file in files {
@@ -193,20 +203,27 @@ fn copy_assets(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 }
 
 fn main() -> std::io::Result<()> {
+	// Step 0 - Load environment variables
 	dotenv().ok();
-
 	let output_dir = env::get_output_dir();
 	let path = env::get_data_dir();
 
+	// Step 1 - Get all public directories
 	let dirs = get_all_dirs(&path);
+
+	// Step 2 - Get all articles/notes within each public directory
 	let mut files: Vec<File> =
 		dirs.into_iter().flat_map(|d| get_files(d)).collect();
+
+	// Step 3 - Sort files by date
 	files.sort_by(|a, b| b.datetime.partial_cmp(&a.datetime).unwrap());
 
+	// Step 4 - Create necessary folders and files
 	create_directories(&files)?;
 	create_indexes(&output_dir, &files)?;
 	copy_assets(&output_dir, &files)?;
 
+	// Step 5 - Convert each file into an article
 	for file in &files {
 		file_to_template(&output_dir, file)?;
 	}
