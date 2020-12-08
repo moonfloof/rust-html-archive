@@ -13,6 +13,7 @@ pub struct File {
 
 	pub title: String,
 	pub slug: String,
+	pub raw_contents: String,
 	pub contents: String,
 
 	pub datetime: NaiveDateTime,
@@ -24,7 +25,11 @@ pub struct File {
 
 impl File {
 	/// Convert an article title into an ASCII, URL-friendly string
-	fn slugify(title: &str) -> String {
+	fn slugify(title: &str, dateiso: &str) -> String {
+		if title == "" {
+			return dateiso.to_owned();
+		}
+
 		let mut slug = title
 			.chars()
 			.into_iter()
@@ -66,18 +71,20 @@ impl File {
 		name.truncate(name.len() - extension.len());
 
 		// Remove date from start
-		let re = Regex::new(r"^\d{4}-\d{2}-\d{2}\s(.*)").unwrap();
+		let re = Regex::new(r"^(\d{4}-\d{2}-\d{2})?(.*)").unwrap();
 		let captures = re.captures(&name);
-		if captures.is_some() {
-			name = String::from(captures.unwrap().get(1).unwrap().as_str());
+		if let Some(captures) = captures {
+			if let Some(title) = captures.get(2) {
+				return String::from(title.as_str());
+			}
 		}
 
-		name
+		String::from("")
 	}
 
 	/// Simple conversion of text files into HTML (adds paragraphs and line breaks)
-	fn determine_contents(path: &Box<Path>, extension: &str) -> String {
-		let mut contents = read_to_string(&path).unwrap();
+	fn determine_contents(raw_contents: &str, extension: &str) -> String {
+		let mut contents = String::from(raw_contents);
 
 		if extension == ".html" {
 			return contents;
@@ -103,7 +110,7 @@ impl File {
 		let modified = util::st_to_ndt(dt);
 
 		// Regex
-		let re = Regex::new(r"^(\d{4}-\d{2}-\d{2})\s.*").unwrap();
+		let re = Regex::new(r"^(\d{4}-\d{2}-\d{2}).*").unwrap();
 		let captures = re.captures(name);
 		if captures.is_none() {
 			NaiveDateTime::new(modified.date(), modified.time())
@@ -114,12 +121,12 @@ impl File {
 		}
 	}
 
-	fn determine_absolute_url(title: &str, datetime: &NaiveDateTime) -> String {
+	fn determine_absolute_url(slug: &str, datetime: &NaiveDateTime) -> String {
 		format!(
 			"/{}/{}/{}.html",
 			datetime.format("%Y"),
 			datetime.format("%m"),
-			File::slugify(title)
+			slug
 		)
 	}
 
@@ -141,8 +148,10 @@ impl File {
 
 		// Get all fields for File
 		let extension = extension.unwrap();
-		let title = File::determine_title(&entry, &extension);
-		let contents = File::determine_contents(&path, &extension);
+		let mut title = File::determine_title(&entry, &extension);
+		title = title.trim().to_owned();
+		let raw_contents = read_to_string(&path).unwrap();
+		let contents = File::determine_contents(&raw_contents, &extension);
 
 		// Format dates
 		let datetime = File::determine_datetime(&entry);
@@ -153,8 +162,8 @@ impl File {
 		let year_month = datetime.format("%Y/%m").to_string();
 
 		// Remaining fields
-		let url = File::determine_absolute_url(&title, &datetime);
-		let slug = File::slugify(&title);
+		let slug = File::slugify(&title, &dateiso);
+		let url = File::determine_absolute_url(&slug, &datetime);
 		let rel_filename = format!("{}.html", slug);
 		let output_dir =
 			util::str_to_path(&[&env_output_dir, &year, &month]).unwrap();
@@ -171,6 +180,8 @@ impl File {
 			title,
 			slug,
 			contents,
+			raw_contents,
+
 			datetime,
 			dateiso,
 			datehuman,

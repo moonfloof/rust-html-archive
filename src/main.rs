@@ -91,6 +91,16 @@ fn create_directories(files: &Vec<File>) -> std::io::Result<()> {
 	Ok(())
 }
 
+fn shorten_text(text: &str) -> String {
+	if text.len() < 48 {
+		String::from(text)
+	} else {
+		assert!(text.len() >= 48);
+		let short = text.get(0..48).unwrap();
+		format!("{}...", short)
+	}
+}
+
 /// Generate the contents for an archive index file. Either for a yearly archive
 /// or for the entire collection for the main index.
 fn create_index(
@@ -104,9 +114,14 @@ fn create_index(
 		.iter()
 		.map(|file| {
 			let dateiso = file.datetime.format("%Y-%m-%d").to_string();
+			let text = if file.title == "" {
+				shorten_text(&file.raw_contents)
+			} else {
+				String::from(&file.title)
+			};
 			format!(
 				"<li><span>{}</span><a href='{}'>{}</a></li>",
-				&dateiso, &file.url, &file.title
+				&dateiso, &file.url, &text
 			)
 		})
 		.collect::<Vec<String>>()
@@ -186,7 +201,7 @@ fn file_to_template(file: &File) -> std::io::Result<()> {
 /// Grab any locally linked assets in the contents of a file into the same
 /// folder as the article.
 fn copy_assets(output: &str, files: &Vec<File>) -> std::io::Result<()> {
-	let search = Regex::new(r#""\./(.*)""#).unwrap();
+	let search = Regex::new(r#"["']\./([^"']*)["']"#).unwrap();
 	for file in files {
 		let assets = search.captures_iter(&file.contents);
 		for asset in assets {
