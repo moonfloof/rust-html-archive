@@ -48,7 +48,19 @@ impl File {
 		slug = slug.trim_start_matches("-").to_string();
 		slug = slug.to_lowercase();
 
-		slug
+		// Remove duplicate hyphens from the slug
+		let mut last_char = '0';
+		let mut new_slug = String::new();
+
+		for c in slug.chars() {
+			if last_char == '-' && c == '-' {
+				continue;
+			}
+			new_slug.push(c);
+			last_char = c;
+		}
+
+		new_slug
 	}
 
 	/// Figure out the extension of a given file. If not supported,
