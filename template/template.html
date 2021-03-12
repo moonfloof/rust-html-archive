@@ -137,12 +137,18 @@
 			margin-bottom: 24px;
 		}
 
+		#archive ul {
+			margin-left: 0;
+		}
 		#archive li {
 			line-height: 1;
 			margin-bottom: 16px;
+			display: flex;
+			flex-direction: row;
+			line-height: 1.4;
 		}
-		#archive li * {
-			display: inline-block;
+		#archive li::before {
+			content: '●';
 		}
 		#archive li span, #archive li a {
 			margin: 0 8px;
@@ -151,7 +157,16 @@
 			font-weight: 700;
 		}
 
-		@media (max-width: 460px) {
+		@media (max-width: 512px) {
+			#archive li {
+				flex-direction: column-reverse;
+			}
+			#archive li::before {
+				content: '';
+			}
+			#archive li span, #archive li a {
+				margin: 0;
+			}
 			body > header, body > footer .content {
 				display: block;
 				text-align: center;
