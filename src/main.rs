@@ -103,14 +103,37 @@ fn create_directories(files: &Vec<File>) -> std::io::Result<()> {
 	Ok(())
 }
 
-fn shorten_text(text: &str) -> String {
-	if text.len() < 48 {
+fn shorten_text(text: &str, max_length: usize) -> String {
+	if text.len() < max_length {
 		String::from(text)
 	} else {
-		assert!(text.len() >= 48);
-		let short = text.get(0..48).unwrap();
+		let short: String = text.chars().take(max_length).collect();
 		format!("{}...", short)
 	}
+}
+
+fn format_file_template(file: &File, template_name: &str) -> String {
+	let tmp_filename = &format!("{}.html", template_name);
+	let tmp_path = util::str_to_path(&["template", tmp_filename]).unwrap();
+	let mut template = read_to_string(tmp_path).unwrap();
+
+	let title = if file.title == "" {
+		shorten_text(&file.raw_contents, 48)
+	} else {
+		String::from(&file.title)
+	};
+
+	let summary = shorten_text(&file.raw_contents, 160);
+
+	template = template.replace(r"{{url}}", &file.url);
+	template = template.replace(r"{{title}}", &title);
+	template = template.replace(r"{{summary}}", &summary);
+	template = template.replace(r"{{dateiso}}", &file.dateiso);
+	template = template.replace(r"{{datehuman}}", &file.datehuman);
+	template = template.replace(r"{{dateisoshort}}", &file.dateisoshort);
+	template = template.replace(r"{{content}}", &file.contents);
+
+	template
 }
 
 /// Generate the contents for an archive index file. Either for a yearly archive
@@ -124,26 +147,13 @@ fn create_index(
 ) -> String {
 	let list = files
 		.iter()
-		.map(|file| {
-			let text = if file.title == "" {
-				shorten_text(&file.raw_contents)
-			} else {
-				String::from(&file.title)
-			};
-
-			format!(
-				"<li><span>{}</span><a href='{}'>{}</a></li>",
-				&file.dateisoshort, &file.url, &text
-			)
-		})
+		.map(|file| format_file_template(&file, "archive-item"))
 		.collect::<Vec<String>>()
 		.join("");
 
-	let list = format!("<ul>{}</ul>", list);
-
 	let mut archive = String::from(archive_html);
 	archive = archive.replace(r"{{title}}", &title);
-	archive = archive.replace(r"{{content}}", &list);
+	archive = archive.replace(r"{{archive-item}}", &list);
 
 	let mut template = String::from(template_html);
 	template = template.replace(r"{{title}}", &title);
@@ -188,34 +198,29 @@ fn create_indexes(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 }
 
 /// Generate a single article file based on the contents of a file
-fn file_to_template(file: &File) -> std::io::Result<()> {
+fn article_to_file(file: &File) -> std::io::Result<()> {
 	// Ignore files that have already been processed
 	// TODO: Look at checksum and update the file if it's different
 	let path = Path::new(&file.output_file);
 	if path.exists() {
 		log::debug!(
-			"[file_to_template] '{}' already exists. Skipping.",
+			"[article_to_file] '{}' already exists. Skipping.",
 			&path.to_str().unwrap()
 		);
 		return Ok(());
 	}
 
 	let tmp_path = util::str_to_path(&["template", "template.html"]).unwrap();
-	let sng_path = util::str_to_path(&["template", "single.html"]).unwrap();
 	let mut template = read_to_string(tmp_path)?;
-	let mut single = read_to_string(sng_path)?;
 
-	single = single.replace(r"{{title}}", &file.title);
-	single = single.replace(r"{{content}}", &file.contents);
-	single = single.replace(r"{{dateiso}}", &file.dateiso);
-	single = single.replace(r"{{datehuman}}", &file.datehuman);
+	let single = format_file_template(&file, "single");
 
 	template = template.replace(r"{{content}}", &single);
 	template = template.replace(r"{{title}}", &file.title);
 	template = template.replace(r"{{dateyear}}", &file.year);
 
 	log::debug!(
-		"[file_to_template] Writing article '{}'",
+		"[article_to_file] Writing article '{}'",
 		&path.to_str().unwrap()
 	);
 	write(&file.output_file, template)?;
@@ -234,6 +239,7 @@ fn copy_assets(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 			let destination =
 				util::str_to_path(&[output, &file.year_month, &asset[1]])
 					.unwrap();
+
 			if destination.exists() {
 				log::debug!(
 					"[copy_assets] '{}' already exists. Skipping.",
@@ -241,6 +247,7 @@ fn copy_assets(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 				);
 				continue;
 			}
+
 			log::debug!("[copy_assets] Copying file '{}'", &asset[1]);
 			fs::copy(asset_path, destination)?;
 		}
@@ -275,7 +282,7 @@ fn main() -> std::io::Result<()> {
 
 	// Step 5 - Convert each file into an article
 	for file in &files {
-		file_to_template(file)?;
+		article_to_file(file)?;
 	}
 
 	Ok(())
