@@ -20,3 +20,10 @@ pub fn get_public_dir() -> String {
 pub fn get_data_dir() -> String {
 	env::var("DATA_DIR").unwrap()
 }
+
+pub fn get_overwrite_existing() -> bool {
+	let default = String::from("false");
+	let overwrite_existing = env::var("OVERWRITE_EXISTING").unwrap_or(default);
+
+	overwrite_existing == "true"
+}

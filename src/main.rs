@@ -222,7 +222,7 @@ fn article_to_file(file: &File, recent_posts: &str) -> std::io::Result<()> {
 	// Ignore files that have already been processed
 	// TODO: Look at checksum and update the file if it's different
 	let path = Path::new(&file.output_file);
-	if path.exists() {
+	if path.exists() && !env::get_overwrite_existing() {
 		log::debug!(
 			"[article_to_file] '{}' already exists. Skipping.",
 			&path.to_str().unwrap()
