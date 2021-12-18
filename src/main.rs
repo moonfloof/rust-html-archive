@@ -144,6 +144,7 @@ fn create_index(
 	title: &str,
 	year: &str,
 	files: &Vec<File>,
+	recent_posts: &str,
 ) -> String {
 	let list = files
 		.iter()
@@ -159,13 +160,18 @@ fn create_index(
 	template = template.replace(r"{{title}}", &title);
 	template = template.replace(r"{{content}}", &archive);
 	template = template.replace(r"{{dateyear}}", &year);
+	template = template.replace(r"{{recent-posts}}", recent_posts);
 
 	template
 }
 
 /// Generate an index file for each unique year where articles have been posted.
 /// Also generate a main index file.
-fn create_indexes(output: &str, files: &Vec<File>) -> std::io::Result<()> {
+fn create_indexes(
+	output: &str,
+	files: &Vec<File>,
+	recent_posts: &str,
+) -> std::io::Result<()> {
 	let tmp_path = util::str_to_path(&["template", "template.html"]).unwrap();
 	let arc_path = util::str_to_path(&["template", "archive.html"]).unwrap();
 
@@ -174,7 +180,14 @@ fn create_indexes(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 
 	let now = SystemTime::now();
 	let year = util::st_to_ndt(now).format("%Y").to_string();
-	let index = create_index(&template, &archive, "home", &year, files);
+	let index = create_index(
+		&template,
+		&archive,
+		"Blog Posts",
+		&year,
+		files,
+		recent_posts,
+	);
 
 	let write_path = util::str_to_path(&[output, "index.html"]).unwrap();
 	log::debug!("[create_indexes] Writing main index");
@@ -183,7 +196,14 @@ fn create_indexes(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 	let archives = group_by_year(files);
 	for (year, files) in archives {
 		let title = format!("Posts from {}", &year);
-		let contents = create_index(&template, &archive, &title, &year, &files);
+		let contents = create_index(
+			&template,
+			&archive,
+			&title,
+			&year,
+			&files,
+			recent_posts,
+		);
 
 		let write_path =
 			util::str_to_path(&[output, &year, "index.html"]).unwrap();
@@ -198,7 +218,7 @@ fn create_indexes(output: &str, files: &Vec<File>) -> std::io::Result<()> {
 }
 
 /// Generate a single article file based on the contents of a file
-fn article_to_file(file: &File) -> std::io::Result<()> {
+fn article_to_file(file: &File, recent_posts: &str) -> std::io::Result<()> {
 	// Ignore files that have already been processed
 	// TODO: Look at checksum and update the file if it's different
 	let path = Path::new(&file.output_file);
@@ -218,6 +238,7 @@ fn article_to_file(file: &File) -> std::io::Result<()> {
 	template = template.replace(r"{{content}}", &single);
 	template = template.replace(r"{{title}}", &file.title);
 	template = template.replace(r"{{dateyear}}", &file.year);
+	template = template.replace(r"{{recent-posts}}", recent_posts);
 
 	log::debug!(
 		"[article_to_file] Writing article '{}'",
@@ -226,6 +247,17 @@ fn article_to_file(file: &File) -> std::io::Result<()> {
 	write(&file.output_file, template)?;
 
 	Ok(())
+}
+
+/// Use the "recent-post" template to take the five most recent posts and
+/// create a string to add them to each blog post and index
+fn get_recent_posts(files: &Vec<File>) -> String {
+	files
+		.iter()
+		.take(5)
+		.map(|file| format_file_template(&file, "recent-post"))
+		.collect::<Vec<String>>()
+		.join("")
 }
 
 /// Grab any locally linked assets in the contents of a file into the same
@@ -275,14 +307,17 @@ fn main() -> std::io::Result<()> {
 	// Step 3 - Sort files by date
 	files.sort_by(|a, b| b.datetime.partial_cmp(&a.datetime).unwrap());
 
+	// Step 3.5 - Get recent posts to use on sidebar
+	let recent_posts = get_recent_posts(&files);
+
 	// Step 4 - Create necessary folders and files
 	create_directories(&files)?;
-	create_indexes(&output_dir, &files)?;
+	create_indexes(&output_dir, &files, &recent_posts)?;
 	copy_assets(&output_dir, &files)?;
 
 	// Step 5 - Convert each file into an article
 	for file in &files {
-		article_to_file(file)?;
+		article_to_file(file, &recent_posts)?;
 	}
 
 	Ok(())
