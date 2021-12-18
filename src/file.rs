@@ -143,6 +143,17 @@ impl File {
 		)
 	}
 
+	/// This can be easily broken by placing `<` or `>` inside a tag's
+	/// quoted attribute (eg. `<img src=">" />`)
+	///
+	/// It's quick and dirty, but it works most of the time!
+	///
+	/// Make sure your blog posts are formatted properly before using this.
+	fn strip_html(raw_contents: &str) -> String {
+		let regex = Regex::new(r"<[^>]*>").unwrap();
+		regex.replace_all(raw_contents, "").to_string()
+	}
+
 	pub fn new(entry: DirEntry) -> Option<File> {
 		let path = entry.path().into_boxed_path();
 		let env_output_dir = env::get_output_dir();
@@ -165,6 +176,9 @@ impl File {
 		title = title.trim().to_owned();
 		let raw_contents = read_to_string(&path).unwrap();
 		let contents = File::determine_contents(&raw_contents, &extension);
+
+		// Overwrite raw contents with HTML removed
+		let raw_contents = File::strip_html(&raw_contents);
 
 		// Format dates
 		let datetime = File::determine_datetime(&entry);
