@@ -15,3 +15,8 @@ This software is/must be:
 * If the file has a `txt` or `md` extension, it will be displayed on the page as plain text with no formatting.
 * If the file has a `html` extension, it will be used exactly as-is. Literally any HTML can be included here, including scripts, iframes. It's your content after all, so all responsibility is placed upon you.
 * Any styles, images, audio, videos can be copied over to the same folder, assuming they are sourced locally in your HTML file. For example: `<img src="./image.jpg" />` will copy `image.jpg`). The detection is based on only the quotation marks and the dot slash.
+* Because of a Windows limitation in what can be contained in filenames, the following phrases will be converted to their relevant symbol:
+  * `{{q}}` -> `?`
+  * `{{c}}` -> `:`
+  * `{{s}}` -> `"`
+  * `{{p}}` -> `|`

@@ -83,6 +83,12 @@ impl File {
 		// Remove extension
 		name.truncate(name.len() - extension.len());
 
+		// Replace symbols
+		name = name.replace(r"{{q}}", "?");
+		name = name.replace(r"{{c}}", ":");
+		name = name.replace(r"{{s}}", "\"");
+		name = name.replace(r"{{p}}", "|");
+
 		// Remove date from start
 		let re = Regex::new(r"^(\d{4}-\d{2}-\d{2})?(.*)").unwrap();
 		let captures = re.captures(&name);
