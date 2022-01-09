@@ -252,6 +252,16 @@ fn article_to_file(file: &File, recent_posts: &str) -> std::io::Result<()> {
 /// Use the "recent-post" template to take the five most recent posts and
 /// create a string to add them to each blog post and index
 fn get_recent_posts(files: &Vec<File>) -> String {
+	let path = util::str_to_path(&["template", "recent-post.html"]).unwrap();
+
+	if !path.exists() {
+		log::debug!(
+			"[get_recent_posts] Template '{}' doesn't exist. Skipping.",
+			&path.to_str().unwrap()
+		);
+		return String::from("");
+	}
+
 	files
 		.iter()
 		.take(5)
