@@ -3,6 +3,7 @@ use env_logger;
 use fs::write;
 use log;
 use regex::Regex;
+use rss::{ChannelBuilder, GuidBuilder, Item, ItemBuilder};
 use std::collections::HashMap;
 use std::fs::{self, read_to_string};
 use std::path::Path;
@@ -298,12 +299,53 @@ fn copy_assets(output: &str, files: &[File]) -> std::io::Result<()> {
 	Ok(())
 }
 
+fn files_to_rss(files: &[File], site: &env::Site) {
+	let items: Vec<Item> = files
+		.iter()
+		.map(|file| {
+			let post_url = format!("{}{}", &site.url_base, file.url);
+
+			let guid = GuidBuilder::default()
+				.value(&post_url.clone())
+				.permalink(true)
+				.build();
+
+			ItemBuilder::default()
+				.title(file.title.clone())
+				.description(shorten_text(&file.raw_contents, 160))
+				.link(post_url)
+				.guid(guid)
+				.pub_date(
+					file.datetime.format("%a, %d %b %Y %X GMT").to_string(),
+				)
+				.build()
+		})
+		.collect();
+
+	let rss_feed = ChannelBuilder::default()
+		.title(&site.title)
+		.description(&site.description)
+		.link(&site.url_base)
+		.generator(String::from(
+			"Tombo Archive (https://git.tombo.sh/tom/rust-tombo-archive)",
+		))
+		.items(items)
+		.build()
+		.to_string();
+
+	let write_path =
+		util::str_to_path(&[&env::get_output_dir(), "rss.xml"]).unwrap();
+
+	write(write_path, rss_feed).unwrap();
+}
+
 fn main() -> std::io::Result<()> {
 	// Step 0 - Set up environment
 	dotenv().ok();
 	env_logger::init();
 	let output_dir = env::get_output_dir();
 	let path = env::get_data_dir();
+	let site_config = env::get_site_config();
 
 	// Step 1 - Get all public directories
 	let dirs = get_all_dirs(&path);
@@ -329,6 +371,9 @@ fn main() -> std::io::Result<()> {
 	for file in &files {
 		article_to_file(file, &recent_posts)?;
 	}
+
+	// Step 6 - Output RSS feed
+	files_to_rss(&files, &site_config);
 
 	Ok(())
 }
