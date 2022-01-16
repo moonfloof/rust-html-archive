@@ -52,7 +52,7 @@ fn get_files(path: Box<Path>) -> Vec<File> {
 
 /// Convert single Vec of Files into groups of years
 /// (for making yearly archives)
-fn group_by_year(files: &Vec<File>) -> HashMap<String, Vec<File>> {
+fn group_by_year(files: &[File]) -> HashMap<String, Vec<File>> {
 	let mut map: HashMap<String, Vec<File>> = HashMap::new();
 
 	files.iter().for_each(|file| {
@@ -68,7 +68,7 @@ fn group_by_year(files: &Vec<File>) -> HashMap<String, Vec<File>> {
 }
 
 /// Return a list of unique folders based on the posts to convert
-fn get_unique_folders(files: &Vec<File>) -> Vec<String> {
+fn get_unique_folders(files: &[File]) -> Vec<String> {
 	let mut folders: Vec<String> =
 		files.iter().map(|file| file.year_month.clone()).collect();
 
@@ -82,7 +82,7 @@ fn get_unique_folders(files: &Vec<File>) -> Vec<String> {
 }
 
 /// Create all year and month directories for
-fn create_directories(files: &Vec<File>) -> std::io::Result<()> {
+fn create_directories(files: &[File]) -> std::io::Result<()> {
 	let output_dir = env::get_output_dir();
 	let output_path = Path::new(&output_dir);
 
@@ -143,7 +143,7 @@ fn create_index(
 	archive_html: &str,
 	title: &str,
 	year: &str,
-	files: &Vec<File>,
+	files: &[File],
 	recent_posts: &str,
 ) -> String {
 	let list = files
@@ -169,7 +169,7 @@ fn create_index(
 /// Also generate a main index file.
 fn create_indexes(
 	output: &str,
-	files: &Vec<File>,
+	files: &[File],
 	recent_posts: &str,
 ) -> std::io::Result<()> {
 	let tmp_path = util::str_to_path(&["template", "template.html"]).unwrap();
@@ -251,7 +251,7 @@ fn article_to_file(file: &File, recent_posts: &str) -> std::io::Result<()> {
 
 /// Use the "recent-post" template to take the five most recent posts and
 /// create a string to add them to each blog post and index
-fn get_recent_posts(files: &Vec<File>) -> String {
+fn get_recent_posts(files: &[File]) -> String {
 	let path = util::str_to_path(&["template", "recent-post.html"]).unwrap();
 
 	if !path.exists() {
@@ -272,7 +272,7 @@ fn get_recent_posts(files: &Vec<File>) -> String {
 
 /// Grab any locally linked assets in the contents of a file into the same
 /// folder as the article.
-fn copy_assets(output: &str, files: &Vec<File>) -> std::io::Result<()> {
+fn copy_assets(output: &str, files: &[File]) -> std::io::Result<()> {
 	let search = Regex::new(r#"["']\./([^"']*)["']"#).unwrap();
 	for file in files {
 		let assets = search.captures_iter(&file.contents);
