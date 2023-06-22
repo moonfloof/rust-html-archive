@@ -78,27 +78,31 @@
       max-width: 960px;
     }
 
-    #body {
+    .body {
       padding: 32px;
+      padding-bottom: 0;
       display: flex;
-      flex: 1;
     }
 
-    #maincontent {
-      flex: 1;
+    .left {
+      width: 96px;
     }
 
-    #sidebar img {
+    .left img {
       width: 64px;
       margin-right: 32px;
       border-radius: 32px;
+    }
+
+    .right,
+    .main {
+      flex: 1;
     }
 
     #header {
       display: flex;
       align-items: center;
       height: 64px;
-      margin-bottom: 32px;
     }
 
     #header--name {
@@ -165,37 +169,49 @@
       margin-left: 16px;
     }
 
-    footer {
+    #single footer {
+      padding-top: 32px;
+      margin-top: 32px;
+      border-top: 1px solid var(--col-grey-light);
+    }
+
+    #single footer img {
+      width: 0;
+      height: 0;
+    }
+
+    #footer {
       background-color: var(--col-primary);
       color: var(--col-white);
       line-height: 1.618;
+      margin-top: 32px;
     }
 
-    footer .content {
+    #footer .content {
       padding: 32px;
       padding-left: 128px;
     }
 
-    footer a {
+    #footer a {
       color: var(--col-white);
     }
 
-    footer a:hover {
+    #footer a:hover {
       background-color: var(--col-white);
       text-decoration: none;
       color: var(--col-primary);
     }
 
-    footer p {
+    #footer p {
       margin-bottom: 16px;
     }
 
     @media (max-width: 640px) {
-      #body {
+      .body {
         flex-direction: column;
       }
 
-      #sidebar {
+      .left {
         display: none;
       }
 
@@ -205,7 +221,7 @@
         margin-bottom: 32px;
       }
 
-      footer .content {
+      #footer .content {
         padding-left: 32px;
       }
     }
@@ -214,30 +230,36 @@
 </head>
 
 <body>
-  <div id="body" class="content">
-    <section id="sidebar">
-      <img src="https://www.tomgardiner.me/favicon.png" alt="Tom Gardiner" />
+  <div class="body content h-card p-author">
+    <section class="left">
+      <img class="u-photo" src="https://www.tomgardiner.me/favicon.png" alt="Tom Gardiner" />
     </section>
-    <section id="maincontent">
+    <section class="right">
       <header id="header">
-        <h1 id="header--name">Tom Gardiner</h1>
+        <h1 id="header--name" class="p-name">Tom Gardiner</h1>
         <nav>
-          <a href="/index.html">index</a>&nbsp;&nbsp;<a href="https://www.tombo.sh/"
-            target="_blank">dev</a>&nbsp;&nbsp;<a href="https://www.tombofry.co.uk/"
-            target="_blank">music</a>
+          <a href="https://www.tomgardiner.me/index.html" class="u-url">index</a>&nbsp;
+          <a href="https://www.tombo.sh/" target="_blank">dev</a>&nbsp;
+          <a href="https://www.tombofry.co.uk/" target="_blank">music</a>
         </nav>
       </header>
+    </section>
+  </div>
+  <div class="body content main">
+    <section class="left">&nbsp;</section>
+    <section class="right">
       <main>{{content}}</main>
     </section>
   </div>
-  <footer>
+  <footer id="footer">
     <div class="content">
       <p>&copy; Tom Gardiner {{dateyear}}</p>
       <p>Software developer by day, asleep by night. Aspiring chiptune musician.</p>
       <nav>
-        <a href="/index.html">index</a>&nbsp;&nbsp;<a href="https://www.tombo.sh/"
-          target="_blank">dev</a>&nbsp;&nbsp;<a href="https://www.tombofry.co.uk/"
-          target="_blank">music</a>&nbsp;&nbsp;<a href="/rss.xml">rss</a>
+        <a href="/index.html">index</a>&nbsp;
+        <a href="https://www.tombo.sh/" target="_blank">dev</a>&nbsp;
+        <a href="https://www.tombofry.co.uk/" target="_blank">music</a>&nbsp;
+        <a href="/rss.xml">rss</a>
       </nav>
     </div>
   </footer>
