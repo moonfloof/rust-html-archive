@@ -1,218 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-	<title>{{title}} / Tom Gardiner</title>
-	<style>
-		* {
-			margin: 0;
-			padding: 0;
-			box-sizing: border-box;
-		}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <title>{{title}} / Tom Gardiner</title>
+  <meta name="description" content="Software developer by day, asleep by night. Aspiring chiptune musician.">
 
-		body, pre code {
-			font-family: ui-monospace,
-				Menlo, Monaco,
-				"JetBrains Mono", "Cascadia Mono", "Segoe UI Mono",
-				Consolas,
-				"Lucida Console",
-				"Roboto Mono",
-				"Oxygen Mono",
-				"Ubuntu Monospace",
-				"Source Code Pro",
-				"Fira Mono",
-				"Droid Sans Mono",
-				"Courier New", monospace;
-		}
-		body {
-			color: #222;
-			min-height: 100vh;
-			line-height: 1;
-			display: flex;
-			flex-direction: column;
-		}
-		body > header {
-			display: flex;
-			align-items: center;
-			margin-bottom: 32px;
-		}
-		body > header h1 {
-			flex: 1;
-			font-size: 24pt;
-		}
-		body > header h1 a {
-			color: #222;
-		}
-		body > footer a {
-			color: #fff;
-		}
-		body > footer a:hover {
-			background-color: #fff;
-			color: #3fa9f5;
-			text-decoration: none;
-		}
-		body > footer {
-			background-color: #3fa9f5;
-			color: #fff;
-			font-weight: 700;
-		}
-		body > footer .content {
-			display: flex;
-			align-items: center;
-		}
+  <!-- Facebook Meta Tags -->
+  <meta property="og:url" content="https://www.tomgardiner.me/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="{{title}}" />
+  <meta property="og:description" content="Software developer by day, asleep by night. Aspiring chiptune musician." />
+  <meta property="og:image" content="https://www.tomgardiner.me/favicon.png" />
 
-		a {
-			color: #3fa9f5;
-		}
-		a:hover, body > header h1 a:hover {
-			background-color: #3fa9f5;
-			text-decoration: none;
-			color: #fff;
-		}
+  <!-- Twitter Meta Tags -->
+  <meta property="twitter:domain" content="tomgardiner.me" />
+  <meta property="twitter:url" content="https://www.tomgardiner.me/" />
+  <meta name="twitter:title" content="{{title}}" />
+  <meta name="twitter:description" content="Software developer by day, asleep by night. Aspiring chiptune musician." />
+  <meta name="twitter:image" content="https://www.tomgardiner.me/favicon.png" />
 
-		img {
-			max-width: 100%;
-		}
-		hr {
-			border: 0;
-			border-top: 1px solid #3fa9f5;
-			margin: 32px 0;
-		}
-		ul, ol {
-			margin-left: 32px;
-		}
-		pre code {
-			display: block;
-			background-color: #f8f8f8;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-			padding: 16px;
-			overflow-x: auto;
-		}
+  <link rel="shortcut icon" href="https://www.tomgardiner.me/favicon.png" type="image/png" />
 
-		.content {
-			width: 100%;
-			max-width: 800px;
-			margin: 32px auto;
-			padding: 0 32px;
-		}
-		.flex {
-			flex: 1;
-		}
+  <style>
+    :root {
+      --col-grey: #333;
+      --col-grey-light: #666;
+      --col-primary: #3fa9f5;
+      --col-white: #fff;
+    }
 
-		nav {
-			text-align: right;
-		}
-		nav a {
-			margin: 8px;
-		}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-		article p  { font-size: 1.0rem; }
-		article h1 { font-size: 1.8rem; }
-		article h2 { font-size: 1.5rem; }
-		article h3 { font-size: 1.2rem; }
-		article:last-child {
-			margin-bottom: 0;
-		}
+    body,
+    pre code {
+      font-family: ui-monospace,
+        "JetBrains Mono", "Cascadia Mono", "Segoe UI Mono",
+        Menlo, Monaco,
+        Consolas,
+        "Lucida Console",
+        "Roboto Mono",
+        "Oxygen Mono",
+        "Ubuntu Monospace",
+        "Source Code Pro",
+        "Fira Mono",
+        "Droid Sans Mono",
+        "Courier New", monospace;
+    }
 
-		article > header {
-			margin: 0;
-			line-height: 1.2;
-			color: #555;
-			margin-bottom: 32px;
-		}
-		article > header > h1 {
-			font-size: 1.4rem;
-			margin-bottom: 8px;
-		}
+    body {
+      color: var(--col-grey);
+      min-height: 100vh;
+      line-height: 1;
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+    }
 
-		article > section {
-			line-height: 1.618;
-		}
-		article > section img, article > section p, article > section pre code,
-		article > section blockquote, article > section ul, article > section ol,
-		article > section h1, article > section h2, article > section h3,
-		article > section h4, article > section h5, article > section h6 {
-			margin-bottom: 24px;
-		}
+    a {
+      color: var(--col-primary);
+      font-weight: 700;
+    }
 
-		#archive ul {
-			margin-left: 0;
-		}
-		#archive li {
-			line-height: 1;
-			margin-bottom: 16px;
-			display: flex;
-			flex-direction: row;
-			line-height: 1.4;
-		}
-		#archive li::before {
-			content: '●';
-		}
-		#archive li span, #archive li a {
-			margin: 0 8px;
-		}
-		#archive li a {
-			font-weight: 700;
-		}
+    a:hover {
+      background-color: var(--col-primary);
+      text-decoration: none;
+      color: var(--col-white);
+    }
 
-		@media (max-width: 512px) {
-			#archive li {
-				flex-direction: column-reverse;
-			}
-			#archive li::before {
-				content: '';
-			}
-			#archive li span, #archive li a {
-				margin: 0;
-			}
-			body > header, body > footer .content {
-				display: block;
-				text-align: center;
-			}
-			header nav {
-				display: none;
-			}
-			nav {
-				text-align: center;
-				margin-top: 16px;
-			}
-			nav a {
-				display: inline-block;
-				padding: 12px 24px;
-				margin: 0;
-			}
-			article img {
-				max-width: calc(100% + 64px);
-				margin: auto -32px;
-			}
-		}
-	</style>
+    .content {
+      width: 100%;
+      max-width: 960px;
+    }
+
+    #body {
+      padding: 32px;
+      display: flex;
+      flex: 1;
+    }
+
+    #maincontent {
+      flex: 1;
+    }
+
+    #sidebar img {
+      width: 64px;
+      margin-right: 32px;
+      border-radius: 32px;
+    }
+
+    #header {
+      display: flex;
+      align-items: center;
+      height: 64px;
+      margin-bottom: 32px;
+    }
+
+    #header--name {
+      flex: 1;
+      font-size: 24px;
+    }
+
+    article {
+      line-height: 1.618;
+    }
+
+    article h1,
+    article h2,
+    article h3,
+    article h4,
+    article h5,
+    article h6 {
+      color: var(--col-grey-light);
+      font-size: 20px;
+    }
+
+    article img,
+    article p,
+    article pre code,
+    article header,
+    article blockquote,
+    article ul,
+    article li,
+    article ol,
+    article h1,
+    article h2,
+    article h3,
+    article h4,
+    article h5,
+    article h6,
+    article figcaption {
+      margin-bottom: 16px;
+    }
+
+    ul ul {
+      margin-top: 16px;
+    }
+
+    article ul {
+      margin-left: 16px;
+    }
+
+    article img {
+      max-width: 100%;
+    }
+
+    #archive ul {
+      margin-left: 0;
+    }
+
+    #archive li {
+      line-height: 1;
+      display: flex;
+      flex-direction: row;
+      line-height: 1.618;
+    }
+
+    #archive li a {
+      margin-left: 16px;
+    }
+
+    footer {
+      background-color: var(--col-primary);
+      color: var(--col-white);
+      line-height: 1.618;
+    }
+
+    footer .content {
+      padding: 32px;
+      padding-left: 128px;
+    }
+
+    footer a {
+      color: var(--col-white);
+    }
+
+    footer a:hover {
+      background-color: var(--col-white);
+      text-decoration: none;
+      color: var(--col-primary);
+    }
+
+    footer p {
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 640px) {
+      #body {
+        flex-direction: column;
+      }
+
+      #sidebar {
+        display: none;
+      }
+
+      #header {
+        justify-content: center;
+        flex-direction: column;
+        margin-bottom: 32px;
+      }
+
+      footer .content {
+        padding-left: 32px;
+      }
+    }
+
+  </style>
 </head>
+
 <body>
-	<header class="content">
-		<h1><a href="/">Tom Gardiner</a></h1>
-		<nav>
-			<a href="/index.html">index</a>
-			<a href="/cv.html">cv</a>
-			<a href="https://www.tombo.sh/" rel="noopener" target="_blank">dev</a>
-			<a href="https://www.tombofry.co.uk/" rel="noopener" target="_blank">music</a>
-		</nav>
-	</header>
-	<main class="content flex">
-		{{content}}
-	</main>
-	<footer>
-		<div class="content">
-			<span class="flex">&copy; Tom Gardiner / TomboFry {{dateyear}}</span>
-			<nav>
-				<a href="/index.html">index</a>
-				<a href="https://www.tombo.sh/" rel="noopener" target="_blank">dev</a>
-				<a href="https://www.tombofry.co.uk/" rel="noopener" target="_blank">music</a>
-			</nav>
-		</div>
-		<div class="content">Software developer by day, asleep by night. Aspiring chiptune musician.</div>
-	</footer>
+  <div id="body" class="content">
+    <section id="sidebar">
+      <img src="https://www.tomgardiner.me/favicon.png" alt="Tom Gardiner" />
+    </section>
+    <section id="maincontent">
+      <header id="header">
+        <h1 id="header--name">Tom Gardiner</h1>
+        <nav>
+          <a href="/index.html">index</a>&nbsp;&nbsp;<a href="https://www.tombo.sh/"
+            target="_blank">dev</a>&nbsp;&nbsp;<a href="https://www.tombofry.co.uk/"
+            target="_blank">music</a>
+        </nav>
+      </header>
+      <main>{{content}}</main>
+    </section>
+  </div>
+  <footer>
+    <div class="content">
+      <p>&copy; Tom Gardiner {{dateyear}}</p>
+      <p>Software developer by day, asleep by night. Aspiring chiptune musician.</p>
+      <nav>
+        <a href="/index.html">index</a>&nbsp;&nbsp;<a href="https://www.tombo.sh/"
+          target="_blank">dev</a>&nbsp;&nbsp;<a href="https://www.tombofry.co.uk/"
+          target="_blank">music</a>&nbsp;&nbsp;<a href="/rss.xml">rss</a>
+      </nav>
+    </div>
+  </footer>
 </body>
+
 </html>
