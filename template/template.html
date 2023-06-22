@@ -4,24 +4,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <title>{{title}} / Tom Gardiner</title>
-  <meta name="description" content="Software developer by day, asleep by night. Aspiring chiptune musician.">
+  <title>{{title}} / {{site-title}}</title>
+  <meta name="description" content="{{site-description}}">
 
   <!-- Facebook Meta Tags -->
-  <meta property="og:url" content="https://www.tomgardiner.me/" />
+  <meta property="og:url" content="{{site-url}}" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="{{title}}" />
-  <meta property="og:description" content="Software developer by day, asleep by night. Aspiring chiptune musician." />
-  <meta property="og:image" content="https://www.tomgardiner.me/favicon.png" />
+  <meta property="og:description" content="{{site-description}}" />
+  <meta property="og:image" content="{{site-url}}/favicon.png" />
 
   <!-- Twitter Meta Tags -->
-  <meta property="twitter:domain" content="tomgardiner.me" />
-  <meta property="twitter:url" content="https://www.tomgardiner.me/" />
+  <meta property="twitter:url" content="{{site-url}}" />
   <meta name="twitter:title" content="{{title}}" />
-  <meta name="twitter:description" content="Software developer by day, asleep by night. Aspiring chiptune musician." />
-  <meta name="twitter:image" content="https://www.tomgardiner.me/favicon.png" />
+  <meta name="twitter:description" content="{{site-description}}" />
+  <meta name="twitter:image" content="{{site-url}}/favicon.png" />
 
-  <link rel="shortcut icon" href="https://www.tomgardiner.me/favicon.png" type="image/png" />
+  <link rel="shortcut icon" href="{{site-url}}/favicon.png" type="image/png" />
 
   <style>
     :root {
@@ -232,13 +231,13 @@
 <body>
   <div class="body content h-card p-author">
     <section class="left">
-      <img class="u-photo" src="https://www.tomgardiner.me/favicon.png" alt="Tom Gardiner" />
+      <img class="u-photo" src="{{site-url}}/favicon.png" alt="{{site-title}}" />
     </section>
     <section class="right">
       <header id="header">
-        <h1 id="header--name" class="p-name">Tom Gardiner</h1>
+        <h1 id="header--name" class="p-name">{{site-title}}</h1>
         <nav>
-          <a href="https://www.tomgardiner.me/index.html" class="u-url">index</a>&nbsp;
+          <a href="{{site-url}}" class="u-url">index</a>&nbsp;
           <a href="https://www.tombo.sh/" target="_blank">dev</a>&nbsp;
           <a href="https://www.tombofry.co.uk/" target="_blank">music</a>
         </nav>
@@ -253,13 +252,13 @@
   </div>
   <footer id="footer">
     <div class="content">
-      <p>&copy; Tom Gardiner {{dateyear}}</p>
-      <p>Software developer by day, asleep by night. Aspiring chiptune musician.</p>
+      <p>&copy; {{site-title}} {{dateyear}}</p>
+      <p>{{site-description}}</p>
       <nav>
-        <a href="/index.html">index</a>&nbsp;
+        <a href="{{site-url}}">index</a>&nbsp;
         <a href="https://www.tombo.sh/" target="_blank">dev</a>&nbsp;
         <a href="https://www.tombofry.co.uk/" target="_blank">music</a>&nbsp;
-        <a href="/rss.xml">rss</a>
+        <a href="{{site-url}}/rss.xml">rss</a>
       </nav>
     </div>
   </footer>

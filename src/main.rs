@@ -146,6 +146,7 @@ fn create_index(
 	year: &str,
 	files: &[File],
 	recent_posts: &str,
+	site: &env::Site,
 ) -> String {
 	let list = files
 		.iter()
@@ -163,6 +164,11 @@ fn create_index(
 	template = template.replace(r"{{dateyear}}", &year);
 	template = template.replace(r"{{recent-posts}}", recent_posts);
 
+	// Add global site config variables
+	template = template.replace(r"{{site-title}}", &site.title);
+	template = template.replace(r"{{site-description}}", &site.description);
+	template = template.replace(r"{{site-url}}", &site.url_base);
+
 	template
 }
 
@@ -172,6 +178,7 @@ fn create_indexes(
 	output: &str,
 	files: &[File],
 	recent_posts: &str,
+	site: &env::Site,
 ) -> std::io::Result<()> {
 	let tmp_path = util::str_to_path(&["template", "template.html"]).unwrap();
 	let arc_path = util::str_to_path(&["template", "archive.html"]).unwrap();
@@ -188,6 +195,7 @@ fn create_indexes(
 		&year,
 		files,
 		recent_posts,
+		site,
 	);
 
 	let write_path = util::str_to_path(&[output, "index.html"]).unwrap();
@@ -204,6 +212,7 @@ fn create_indexes(
 			&year,
 			&files,
 			recent_posts,
+			site,
 		);
 
 		let write_path =
@@ -219,7 +228,11 @@ fn create_indexes(
 }
 
 /// Generate a single article file based on the contents of a file
-fn article_to_file(file: &File, recent_posts: &str) -> std::io::Result<()> {
+fn article_to_file(
+	file: &File,
+	recent_posts: &str,
+	site: &env::Site,
+) -> std::io::Result<()> {
 	// Ignore files that have already been processed
 	// TODO: Look at checksum and update the file if it's different
 	let path = Path::new(&file.output_file);
@@ -240,6 +253,11 @@ fn article_to_file(file: &File, recent_posts: &str) -> std::io::Result<()> {
 	template = template.replace(r"{{title}}", &file.title);
 	template = template.replace(r"{{dateyear}}", &file.year);
 	template = template.replace(r"{{recent-posts}}", recent_posts);
+
+	// Add global site config variables
+	template = template.replace(r"{{site-title}}", &site.title);
+	template = template.replace(r"{{site-description}}", &site.description);
+	template = template.replace(r"{{site-url}}", &site.url_base);
 
 	log::debug!(
 		"[article_to_file] Writing article '{}'",
@@ -365,12 +383,12 @@ fn main() -> std::io::Result<()> {
 
 	// Step 4 - Create necessary folders and files
 	create_directories(&files)?;
-	create_indexes(&output_dir, &files, &recent_posts)?;
+	create_indexes(&output_dir, &files, &recent_posts, &site_config)?;
 	copy_assets(&output_dir, &files)?;
 
 	// Step 5 - Convert each file into an article
 	for file in &files {
-		article_to_file(file, &recent_posts)?;
+		article_to_file(file, &recent_posts, &site_config)?;
 	}
 
 	// Step 6 - Output RSS feed
