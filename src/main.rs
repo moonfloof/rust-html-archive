@@ -310,14 +310,15 @@ fn files_to_rss(files: &[File], site: &env::Site) {
 				.permalink(true)
 				.build();
 
+			let pub_date =
+				file.datetime.format("%a, %d %b %Y %X GMT").to_string();
+
 			ItemBuilder::default()
-				.title(file.title.clone())
-				.description(shorten_text(&file.raw_contents, 160))
-				.link(post_url)
-				.guid(guid)
-				.pub_date(
-					file.datetime.format("%a, %d %b %Y %X GMT").to_string(),
-				)
+				.title(Some(file.title.clone()))
+				.description(Some(shorten_text(&file.raw_contents, 160)))
+				.link(Some(post_url))
+				.guid(Some(guid))
+				.pub_date(Some(pub_date))
 				.build()
 		})
 		.collect();
@@ -326,9 +327,9 @@ fn files_to_rss(files: &[File], site: &env::Site) {
 		.title(&site.title)
 		.description(&site.description)
 		.link(&site.url_base)
-		.generator(String::from(
+		.generator(Some(String::from(
 			"Tombo Archive (https://git.tombo.sh/tom/rust-tombo-archive)",
-		))
+		)))
 		.items(items)
 		.build()
 		.to_string();
