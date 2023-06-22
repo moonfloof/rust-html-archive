@@ -113,7 +113,11 @@ fn shorten_text(text: &str, max_length: usize) -> String {
 	}
 }
 
-fn format_file_template(file: &File, template_name: &str) -> String {
+fn format_file_template(
+	file: &File,
+	template_name: &str,
+	site: &env::Site,
+) -> String {
 	let tmp_filename = &format!("{}.html", template_name);
 	let tmp_path = util::str_to_path(&["template", tmp_filename]).unwrap();
 	let mut template = read_to_string(tmp_path).unwrap();
@@ -125,8 +129,9 @@ fn format_file_template(file: &File, template_name: &str) -> String {
 	};
 
 	let summary = shorten_text(&file.raw_contents, 160);
+	let absolute_url = &format!("{}{}", &site.url_base, &file.url);
 
-	template = template.replace(r"{{url}}", &file.url);
+	template = template.replace(r"{{url}}", &absolute_url);
 	template = template.replace(r"{{title}}", &title);
 	template = template.replace(r"{{summary}}", &summary);
 	template = template.replace(r"{{dateiso}}", &file.dateiso);
@@ -146,11 +151,11 @@ fn create_index(
 	year: &str,
 	files: &[File],
 	recent_posts: &str,
-	site: &env::Site,
 ) -> String {
+	let site = env::get_site_config();
 	let list = files
 		.iter()
-		.map(|file| format_file_template(&file, "archive-item"))
+		.map(|file| format_file_template(&file, "archive-item", &site))
 		.collect::<Vec<String>>()
 		.join("");
 
@@ -178,7 +183,6 @@ fn create_indexes(
 	output: &str,
 	files: &[File],
 	recent_posts: &str,
-	site: &env::Site,
 ) -> std::io::Result<()> {
 	let tmp_path = util::str_to_path(&["template", "template.html"]).unwrap();
 	let arc_path = util::str_to_path(&["template", "archive.html"]).unwrap();
@@ -195,7 +199,6 @@ fn create_indexes(
 		&year,
 		files,
 		recent_posts,
-		site,
 	);
 
 	let write_path = util::str_to_path(&[output, "index.html"]).unwrap();
@@ -212,7 +215,6 @@ fn create_indexes(
 			&year,
 			&files,
 			recent_posts,
-			site,
 		);
 
 		let write_path =
@@ -228,11 +230,7 @@ fn create_indexes(
 }
 
 /// Generate a single article file based on the contents of a file
-fn article_to_file(
-	file: &File,
-	recent_posts: &str,
-	site: &env::Site,
-) -> std::io::Result<()> {
+fn article_to_file(file: &File, recent_posts: &str) -> std::io::Result<()> {
 	// Ignore files that have already been processed
 	// TODO: Look at checksum and update the file if it's different
 	let path = Path::new(&file.output_file);
@@ -244,10 +242,11 @@ fn article_to_file(
 		return Ok(());
 	}
 
+	let site = env::get_site_config();
 	let tmp_path = util::str_to_path(&["template", "template.html"]).unwrap();
 	let mut template = read_to_string(tmp_path)?;
 
-	let single = format_file_template(&file, "single");
+	let single = format_file_template(&file, "single", &site);
 
 	template = template.replace(r"{{content}}", &single);
 	template = template.replace(r"{{title}}", &file.title);
@@ -281,10 +280,12 @@ fn get_recent_posts(files: &[File]) -> String {
 		return String::from("");
 	}
 
+	let site = env::get_site_config();
+
 	files
 		.iter()
 		.take(5)
-		.map(|file| format_file_template(&file, "recent-post"))
+		.map(|file| format_file_template(&file, "recent-post", &site))
 		.collect::<Vec<String>>()
 		.join("")
 }
@@ -317,7 +318,8 @@ fn copy_assets(output: &str, files: &[File]) -> std::io::Result<()> {
 	Ok(())
 }
 
-fn files_to_rss(files: &[File], site: &env::Site) {
+fn files_to_rss(files: &[File]) {
+	let site = env::get_site_config();
 	let items: Vec<Item> = files
 		.iter()
 		.map(|file| {
@@ -364,7 +366,6 @@ fn main() -> std::io::Result<()> {
 	env_logger::init();
 	let output_dir = env::get_output_dir();
 	let path = env::get_data_dir();
-	let site_config = env::get_site_config();
 
 	// Step 1 - Get all public directories
 	let dirs = get_all_dirs(&path);
@@ -383,16 +384,16 @@ fn main() -> std::io::Result<()> {
 
 	// Step 4 - Create necessary folders and files
 	create_directories(&files)?;
-	create_indexes(&output_dir, &files, &recent_posts, &site_config)?;
+	create_indexes(&output_dir, &files, &recent_posts)?;
 	copy_assets(&output_dir, &files)?;
 
 	// Step 5 - Convert each file into an article
 	for file in &files {
-		article_to_file(file, &recent_posts, &site_config)?;
+		article_to_file(file, &recent_posts)?;
 	}
 
 	// Step 6 - Output RSS feed
-	files_to_rss(&files, &site_config);
+	files_to_rss(&files);
 
 	Ok(())
 }

@@ -1,7 +1,13 @@
 <article id="single" class="h-entry">
   <header>
     <h1 class="p-name">{{title}}</h1>
-    <time class="dt-published" datetime="{{dateiso}}">{{datehuman}}</time>
+    <a id="canonical-url" class="u-url" href="{{url}}">
+      <time class="dt-published" datetime="{{dateiso}}">{{datehuman}}</time>
+    </a>
   </header>
   <section class="e-content">{{content}}</section>
+  <footer class="p-author h-card">
+    Posted by <a class="u-url" href="{{site-url}}">{{site-title}}</a>.
+    <img src="{{site-url}}/favicon.png" class="u-photo" />
+  </footer>
 </article>
