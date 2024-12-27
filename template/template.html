@@ -54,6 +54,7 @@
     }
 
     body {
+      background-color: var(--col-white);
       color: var(--col-grey);
       min-height: 100vh;
       line-height: 1;
@@ -236,6 +237,15 @@
 
       #footer .content {
         padding-left: 32px;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --col-grey: #eee;
+        --col-grey-light: #fff;
+        --col-primary: #6ac1ff;
+        --col-white: #222;
       }
     }
 
