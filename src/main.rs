@@ -348,7 +348,7 @@ fn files_to_rss(files: &[File]) {
 		.description(&site.description)
 		.link(&site.url_base)
 		.generator(Some(String::from(
-			"Tombo Archive (https://git.tombo.sh/tom/rust-tombo-archive)",
+			"HTML Archive (https://git.tombo.sh/floof/rust-html-archive)",
 		)))
 		.items(items)
 		.build()

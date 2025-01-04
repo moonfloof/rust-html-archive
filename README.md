@@ -1,4 +1,4 @@
-# Tombo Archive
+# HTML Archive
 
 A very small piece of software to collect all HTML and plain text files within a given folder structure and convert them into a static site.
 

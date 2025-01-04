@@ -1,7 +1,7 @@
 [package]
-name = "tombo-archive"
+name = "html-archive"
 version = "0.1.0"
-authors = ["Tom Gardiner <tom@tombofry.co.uk>"]
+authors = ["moonfloof <git@moonfloof.com>"]
 edition = "2021"
 license = "MIT"
 
